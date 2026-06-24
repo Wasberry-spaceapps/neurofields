@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCanvas | The Hub for Neuroscience</title>
+    
+    <!-- Fonts: Inter for UI, Merriweather for academic headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        neuro: {
+                            dark: '#0f172a',    // slate-900
+                            card: '#1e293b',    // slate-800
+                            border: '#334155',  // slate-700
+                            teal: '#2dd4bf',    // teal-400
+                            blue: '#38bdf8',    // sky-400
+                            text: '#f8fafc',    // slate-50
+                            muted: '#94a3b8'    // slate-400
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- 3D Force Graph for Pathways -->
+    <script src="https://unpkg.com/3d-force-graph"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-neuro-dark text-neuro-text font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="border-b border-neuro-border bg-neuro-dark/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigate('home')">
+                    <svg class="w-8 h-8 text-neuro-teal mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span class="font-serif font-bold text-2xl tracking-tight">NeuroCanvas</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="navigate('before-code')" class="nav-link text-neuro-muted hover:text-neuro-teal transition-colors text-sm font-medium">Before You Code</button>
+                    <button onclick="navigate('resources')" class="nav-link text-neuro-muted hover:text-neuro-teal transition-colors text-sm font-medium">Neuro Resources</button>
+                    <button onclick="navigate('pathways')" class="nav-link text-neuro-muted hover:text-neuro-teal transition-colors text-sm font-medium">Pathways Map</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow relative">
+        
+        <!-- View: HOME -->
+        <section id="view-home" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 active">
+            <div class="max-w-3xl">
+                <h1 class="font-serif text-5xl sm:text-6xl text-white leading-tight mb-6">
+                    Mapping the mind requires a <span class="text-transparent bg-clip-text bg-gradient-to-r from-neuro-teal to-neuro-blue">clear canvas.</span>
+                </h1>
+                <p class="text-xl text-neuro-muted mb-10 leading-relaxed font-light">
+                    The premier hub for neuroscience students, researchers, and enthusiasts. No corporate fluff, no jargon—just high-signal tools and curated resources to help you do better science.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Home Cards -->
+                    <div onclick="navigate('before-code')" class="bg-neuro-card p-6 rounded-xl border border-neuro-border hover:border-neuro-teal transition-colors cursor-pointer group">
+                        <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-neuro-teal transition-colors">Before You Code</h3>
+                        <p class="text-neuro-muted text-sm leading-relaxed">Define your data decisions upfront to prevent p-hacking and save months of redone analysis.</p>
+                    </div>
+                    <div onclick="navigate('resources')" class="bg-neuro-card p-6 rounded-xl border border-neuro-border hover:border-neuro-teal transition-colors cursor-pointer group">
+                        <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-neuro-teal transition-colors">Neuro Resources</h3>
+                        <p class="text-neuro-muted text-sm leading-relaxed">An aggressively curated database of 100+ datasets, tools, courses, and internships.</p>
+                    </div>
+                    <div onclick="navigate('pathways')" class="bg-neuro-card p-6 rounded-xl border border-neuro-border hover:border-neuro-teal transition-colors cursor-pointer group">
+                        <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-neuro-teal transition-colors">Pathways Map</h3>
+                        <p class="text-neuro-muted text-sm leading-relaxed">Explore education and career trajectories in brain science through an interactive 3D map.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: BEFORE YOU CODE -->
+        <section id="view-before-code" class="page-view max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 hidden">
+            <div class="mb-10 border-b border-neuro-border pb-8">
+                <h2 class="font-serif text-3xl text-white mb-3">Before You Code</h2>
+                <p class="text-neuro-muted text-lg">Define your data decisions upfront (filters, exclusions, cohort rules) before writing a single line of analysis code. Avoid redoing weeks of work because of one missed upstream decision.</p>
+            </div>
+
+            <div class="bg-neuro-card border border-neuro-border rounded-xl p-8 shadow-xl">
+                <div class="mb-6 flex justify-between items-center">
+                    <h3 class="text-xl font-medium text-white">Study Definition</h3>
+                    <button onclick="toggleApiModal()" class="text-xs text-neuro-muted hover:text-neuro-blue flex items-center gap-1 border border-neuro-border px-3 py-1.5 rounded-full">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 9a1 1 0 012 0v4a1 1 0 11-2 0V9zm1-5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"></path></svg>
+                        API Key (Optional)
+                    </button>
+                </div>
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-neuro-muted mb-2">Primary Data Modality</label>
+                        <select id="byc-modality" class="w-full bg-neuro-dark border border-neuro-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neuro-teal">
+                            <option value="fMRI">fMRI (Functional MRI)</option>
+                            <option value="EEG">EEG / MEG</option>
+                            <option value="Behavioral">Behavioral / Psychophysics</option>
+                            <option value="Electrophysiology">In-vivo Electrophysiology</option>
+                            <option value="Transcriptomics">Spatial Transcriptomics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-neuro-muted mb-2">Brief Study Description & Goals</label>
+                        <textarea id="byc-desc" rows="3" class="w-full bg-neuro-dark border border-neuro-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neuro-teal" placeholder="e.g., We are investigating the role of the prefrontal cortex in decision-making under uncertainty using a bandit task..."></textarea>
+                    </div>
+                    <button onclick="generateChecklist()" id="btn-generate" class="w-full bg-neuro-teal hover:bg-teal-500 text-neuro-dark font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <span>Generate Data Protocol</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generated Checklist Section -->
+            <div id="checklist-container" class="mt-8 hidden">
+                <h3 class="font-serif text-2xl text-white mb-4">Your Data Protocol</h3>
+                <div class="bg-neuro-card border border-neuro-border rounded-xl p-8">
+                    <p class="text-sm text-neuro-muted mb-6">Review and acknowledge these decisions before you touch your dataset.</p>
+                    <div id="checklist-items" class="space-y-4 mb-8">
+                        <!-- Items injected here via JS -->
+                    </div>
+                    
+                    <div class="border-t border-neuro-border pt-6 flex justify-between items-center">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="sign-off-box" class="w-5 h-5 text-neuro-teal bg-neuro-dark border-neuro-border rounded focus:ring-neuro-teal" onchange="checkSignOff()">
+                            <span class="text-sm text-neuro-muted select-none">I have documented these decisions.</span>
+                        </label>
+                        <button id="btn-export" disabled onclick="exportProtocol()" class="bg-neuro-border text-neuro-muted py-2 px-6 rounded-lg transition-colors cursor-not-allowed">
+                            Sign Off & Export Skeleton
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: NEURO RESOURCES -->
+        <section id="view-resources" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 hidden">
+            <div class="mb-8 border-b border-neuro-border pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div class="max-w-2xl">
+                    <h2 class="font-serif text-3xl text-white mb-3">Neuro Resources</h2>
+                    <p class="text-neuro-muted text-lg">A highly curated, noise-free wiki of the best datasets, tools, opportunities, and communities. Currently tracking <span id="resource-count" class="text-neuro-teal font-semibold">100+</span> entries.</p>
+                </div>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-3">
+                    <select id="filter-category" onchange="renderResources()" class="bg-neuro-card border border-neuro-border rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-neuro-teal">
+                        <option value="All">All Categories</option>
+                        <option value="Datasets">Datasets</option>
+                        <option value="Citizen Science">Citizen Science</option>
+                        <option value="Courses/Learning">Courses/Learning</option>
+                        <option value="Internships/Opportunities">Internships/Opportunities</option>
+                        <option value="Tools/Software">Tools/Software</option>
+                        <option value="Communities">Communities</option>
+                    </select>
+                    <select id="filter-level" onchange="renderResources()" class="bg-neuro-card border border-neuro-border rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-neuro-teal">
+                        <option value="All">All Levels</option>
+                        <option value="High School">High School</option>
+                        <option value="Undergrad">Undergrad</option>
+                        <option value="Advanced">Advanced (Grad+)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resource Grid -->
+            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards injected here via JS -->
+            </div>
+        </section>
+
+        <!-- View: PATHWAYS -->
+        <section id="view-pathways" class="page-view hidden h-[calc(100vh-64px)] w-full relative flex">
+            <!-- 3D Graph Container -->
+            <div id="3d-graph" class="w-full h-full bg-black/50"></div>
+            
+            <!-- Floating Overlay UI -->
+            <div class="absolute top-6 left-6 pointer-events-none">
+                <h2 class="font-serif text-2xl text-white mb-2 drop-shadow-lg">Neuroscience Pathways</h2>
+                <p class="text-neuro-muted text-sm max-w-xs drop-shadow-md">Drag to rotate, scroll to zoom. Click any node to explore the career or education stage.</p>
+            </div>
+
+            <!-- Details Sidebar -->
+            <div id="pathway-sidebar" class="absolute top-0 right-0 h-full w-80 bg-neuro-card/95 backdrop-blur border-l border-neuro-border p-6 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+                <button onclick="closeSidebar()" class="absolute top-4 right-4 text-neuro-muted hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="mt-4">
+                    <span id="node-badge" class="text-xs font-semibold uppercase tracking-wider text-neuro-teal bg-neuro-teal/10 px-2 py-1 rounded">Stage</span>
+                    <h3 id="node-title" class="font-serif text-2xl text-white mt-3 mb-4">Node Title</h3>
+                    <p id="node-desc" class="text-neuro-muted text-sm leading-relaxed mb-6">Description goes here.</p>
+                    
+                    <h4 class="text-white text-sm font-medium mb-3 border-b border-neuro-border pb-1">Key Focus Areas</h4>
+                    <ul id="node-skills" class="text-sm text-neuro-muted space-y-2 mb-6 list-disc pl-4">
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- API Key Modal -->
+    <div id="api-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-neuro-card border border-neuro-border p-6 rounded-xl w-full max-w-md">
+            <h3 class="text-lg font-medium text-white mb-2">OpenRouter API Key</h3>
+            <p class="text-xs text-neuro-muted mb-4">Add your free OpenRouter key for dynamic AI checklists. If left blank, the app uses a robust built-in fallback engine based on data modality.</p>
+            <input type="password" id="api-key-input" class="w-full bg-neuro-dark border border-neuro-border rounded-lg px-4 py-2 text-white mb-4 focus:outline-none focus:border-neuro-teal" placeholder="sk-or-v1-...">
+            <div class="flex justify-end gap-3">
+                <button onclick="toggleApiModal()" class="px-4 py-2 text-sm text-neuro-muted hover:text-white">Cancel</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 text-sm bg-neuro-teal text-neuro-dark rounded hover:bg-teal-500 font-medium">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="resources.js"></script>
+    <script src="pathways.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
