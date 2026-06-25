@@ -1,17 +1,22 @@
-/* Custom scrollbar for a sleek desktop experience */
+/* Custom scrollbar for an elegant dark UI */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: #0f172a; 
+    background: transparent; 
 }
 ::-webkit-scrollbar-thumb {
     background: #334155; 
-    border-radius: 4px;
+    border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
     background: #475569; 
+}
+
+/* Specific scrollbar for sidebar */
+.custom-scroll::-webkit-scrollbar-track {
+    background: #1e293b;
 }
 
 /* Page transitions */
@@ -30,14 +35,41 @@ input[type="checkbox"]:checked {
     border-color: transparent;
 }
 
-/* 3D Graph Tooltip overrides */
-.scene-tooltip {
-    background-color: rgba(30, 41, 59, 0.9) !important;
-    border: 1px solid #334155 !important;
-    border-radius: 6px !important;
-    padding: 8px 12px !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 13px !important;
-    color: #f8fafc !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+/* Interactive Chips in Sidebar */
+.nav-chip {
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid #334155;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.nav-chip:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* Resource Links */
+.resource-link {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.resource-link:hover {
+    border-color: #2dd4bf;
+    background: rgba(45, 212, 191, 0.05);
+}
+.resource-link span {
+    color: #f8fafc;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
