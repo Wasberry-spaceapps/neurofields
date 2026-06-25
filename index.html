@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroCanvas | The Hub for Neuroscience</title>
     
-    <!-- Fonts: Inter for UI, Merriweather for academic headings -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
@@ -17,19 +17,11 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Merriweather', 'serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Merriweather', 'serif'] },
                     colors: {
                         neuro: {
-                            dark: '#0f172a',    // slate-900
-                            card: '#1e293b',    // slate-800
-                            border: '#334155',  // slate-700
-                            teal: '#2dd4bf',    // teal-400
-                            blue: '#38bdf8',    // sky-400
-                            text: '#f8fafc',    // slate-50
-                            muted: '#94a3b8'    // slate-400
+                            dark: '#0f172a', card: '#1e293b', border: '#334155',
+                            teal: '#2dd4bf', blue: '#38bdf8', text: '#f8fafc', muted: '#94a3b8'
                         }
                     }
                 }
@@ -37,12 +29,20 @@
         }
     </script>
     
-    <!-- 3D Force Graph for Pathways -->
-    <script src="https://unpkg.com/3d-force-graph"></script>
+    <!-- IMPORT MAP: Solves the Three.js multi-instance WebGL crash -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+          "three-spritetext": "https://unpkg.com/three-spritetext@1.8.1/dist/three-spritetext.mjs",
+          "3d-force-graph": "https://unpkg.com/3d-force-graph@1.73.3/dist/3d-force-graph.mjs"
+        }
+      }
+    </script>
     
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-neuro-dark text-neuro-text font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-neuro-dark text-neuro-text font-sans antialiased min-h-screen flex flex-col overflow-x-hidden">
 
     <!-- Navigation -->
     <nav class="border-b border-neuro-border bg-neuro-dark/80 backdrop-blur-md sticky top-0 z-50">
@@ -57,7 +57,7 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <button onclick="navigate('before-code')" class="nav-link text-neuro-muted hover:text-neuro-teal transition-colors text-sm font-medium">Before You Code</button>
                     <button onclick="navigate('resources')" class="nav-link text-neuro-muted hover:text-neuro-teal transition-colors text-sm font-medium">Neuro Resources</button>
-                    <button onclick="navigate('pathways')" class="nav-link text-neuro-muted hover:text-neuro-teal transition-colors text-sm font-medium">Pathways Map</button>
+                    <button onclick="navigate('pathways')" class="nav-link text-neuro-teal transition-colors text-sm font-medium">Pathways Map</button>
                 </div>
             </div>
         </div>
@@ -66,8 +66,8 @@
     <!-- Main Content Area -->
     <main class="flex-grow relative">
         
-        <!-- View: HOME -->
-        <section id="view-home" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 active">
+        <!-- View: HOME (Set as default active view) -->
+        <section id="view-home" class="page-view active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div class="max-w-3xl">
                 <h1 class="font-serif text-5xl sm:text-6xl text-white leading-tight mb-6">
                     Mapping the mind requires a <span class="text-transparent bg-clip-text bg-gradient-to-r from-neuro-teal to-neuro-blue">clear canvas.</span>
@@ -76,7 +76,6 @@
                     The premier hub for neuroscience students, researchers, and enthusiasts. No corporate fluff, no jargon—just high-signal tools and curated resources to help you do better science.
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Home Cards -->
                     <div onclick="navigate('before-code')" class="bg-neuro-card p-6 rounded-xl border border-neuro-border hover:border-neuro-teal transition-colors cursor-pointer group">
                         <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-neuro-teal transition-colors">Before You Code</h3>
                         <p class="text-neuro-muted text-sm leading-relaxed">Define your data decisions upfront to prevent p-hacking and save months of redone analysis.</p>
@@ -87,7 +86,7 @@
                     </div>
                     <div onclick="navigate('pathways')" class="bg-neuro-card p-6 rounded-xl border border-neuro-border hover:border-neuro-teal transition-colors cursor-pointer group">
                         <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-neuro-teal transition-colors">Pathways Map</h3>
-                        <p class="text-neuro-muted text-sm leading-relaxed">Explore education and career trajectories in brain science through an interactive 3D map.</p>
+                        <p class="text-neuro-muted text-sm leading-relaxed">Explore a massive 3D knowledge graph of education, skills, and careers.</p>
                     </div>
                 </div>
             </div>
@@ -97,18 +96,12 @@
         <section id="view-before-code" class="page-view max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 hidden">
             <div class="mb-10 border-b border-neuro-border pb-8">
                 <h2 class="font-serif text-3xl text-white mb-3">Before You Code</h2>
-                <p class="text-neuro-muted text-lg">Define your data decisions upfront (filters, exclusions, cohort rules) before writing a single line of analysis code. Avoid redoing weeks of work because of one missed upstream decision.</p>
+                <p class="text-neuro-muted text-lg">Define your data decisions upfront (filters, exclusions, cohort rules) before writing a single line of analysis code.</p>
             </div>
-
             <div class="bg-neuro-card border border-neuro-border rounded-xl p-8 shadow-xl">
                 <div class="mb-6 flex justify-between items-center">
                     <h3 class="text-xl font-medium text-white">Study Definition</h3>
-                    <button onclick="toggleApiModal()" class="text-xs text-neuro-muted hover:text-neuro-blue flex items-center gap-1 border border-neuro-border px-3 py-1.5 rounded-full">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 9a1 1 0 012 0v4a1 1 0 11-2 0V9zm1-5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"></path></svg>
-                        API Key (Optional)
-                    </button>
                 </div>
-                
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium text-neuro-muted mb-2">Primary Data Modality</label>
@@ -121,32 +114,24 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-neuro-muted mb-2">Brief Study Description & Goals</label>
-                        <textarea id="byc-desc" rows="3" class="w-full bg-neuro-dark border border-neuro-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neuro-teal" placeholder="e.g., We are investigating the role of the prefrontal cortex in decision-making under uncertainty using a bandit task..."></textarea>
+                        <label class="block text-sm font-medium text-neuro-muted mb-2">Brief Study Description</label>
+                        <textarea id="byc-desc" rows="3" class="w-full bg-neuro-dark border border-neuro-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neuro-teal"></textarea>
                     </div>
                     <button onclick="generateChecklist()" id="btn-generate" class="w-full bg-neuro-teal hover:bg-teal-500 text-neuro-dark font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <span>Generate Data Protocol</span>
                     </button>
                 </div>
             </div>
-
-            <!-- Generated Checklist Section -->
             <div id="checklist-container" class="mt-8 hidden">
                 <h3 class="font-serif text-2xl text-white mb-4">Your Data Protocol</h3>
                 <div class="bg-neuro-card border border-neuro-border rounded-xl p-8">
-                    <p class="text-sm text-neuro-muted mb-6">Review and acknowledge these decisions before you touch your dataset.</p>
-                    <div id="checklist-items" class="space-y-4 mb-8">
-                        <!-- Items injected here via JS -->
-                    </div>
-                    
+                    <div id="checklist-items" class="space-y-4 mb-8"></div>
                     <div class="border-t border-neuro-border pt-6 flex justify-between items-center">
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" id="sign-off-box" class="w-5 h-5 text-neuro-teal bg-neuro-dark border-neuro-border rounded focus:ring-neuro-teal" onchange="checkSignOff()">
                             <span class="text-sm text-neuro-muted select-none">I have documented these decisions.</span>
                         </label>
-                        <button id="btn-export" disabled onclick="exportProtocol()" class="bg-neuro-border text-neuro-muted py-2 px-6 rounded-lg transition-colors cursor-not-allowed">
-                            Sign Off & Export Skeleton
-                        </button>
+                        <button id="btn-export" disabled onclick="exportProtocol()" class="bg-neuro-border text-neuro-muted py-2 px-6 rounded-lg transition-colors cursor-not-allowed">Export Skeleton</button>
                     </div>
                 </div>
             </div>
@@ -157,10 +142,8 @@
             <div class="mb-8 border-b border-neuro-border pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div class="max-w-2xl">
                     <h2 class="font-serif text-3xl text-white mb-3">Neuro Resources</h2>
-                    <p class="text-neuro-muted text-lg">A highly curated, noise-free wiki of the best datasets, tools, opportunities, and communities. Currently tracking <span id="resource-count" class="text-neuro-teal font-semibold">100+</span> entries.</p>
+                    <p class="text-neuro-muted text-lg">A highly curated, noise-free wiki. Currently tracking <span id="resource-count" class="text-neuro-teal font-semibold">100+</span> entries.</p>
                 </div>
-                
-                <!-- Filters -->
                 <div class="flex flex-wrap gap-3">
                     <select id="filter-category" onchange="renderResources()" class="bg-neuro-card border border-neuro-border rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-neuro-teal">
                         <option value="All">All Categories</option>
@@ -179,57 +162,110 @@
                     </select>
                 </div>
             </div>
-
-            <!-- Resource Grid -->
-            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Cards injected here via JS -->
-            </div>
+            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
         <!-- View: PATHWAYS -->
-        <section id="view-pathways" class="page-view hidden h-[calc(100vh-64px)] w-full relative flex">
-            <!-- 3D Graph Container -->
-            <div id="3d-graph" class="w-full h-full bg-black/50"></div>
+        <section id="view-pathways" class="page-view h-[calc(100vh-64px)] w-full relative flex overflow-hidden hidden">
             
-            <!-- Floating Overlay UI -->
-            <div class="absolute top-6 left-6 pointer-events-none">
-                <h2 class="font-serif text-2xl text-white mb-2 drop-shadow-lg">Neuroscience Pathways</h2>
-                <p class="text-neuro-muted text-sm max-w-xs drop-shadow-md">Drag to rotate, scroll to zoom. Click any node to explore the career or education stage.</p>
+            <!-- 3D Graph Container -->
+            <div id="3d-graph" class="w-full h-full bg-[#050914] cursor-move"></div>
+            
+            <!-- UI OVERLAYS -->
+            <div class="absolute top-4 left-4 z-10 flex flex-col gap-2 pointer-events-auto">
+                <div class="bg-neuro-card/80 backdrop-blur border border-neuro-border p-3 rounded-xl shadow-lg">
+                    <h3 class="text-xs font-bold text-neuro-muted uppercase tracking-wider mb-3">Dimension Layers</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-white transition-colors">
+                            <input type="checkbox" checked value="education" class="layer-toggle w-4 h-4 text-neuro-blue rounded border-neuro-border bg-neuro-dark"> Education
+                        </label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-white transition-colors">
+                            <input type="checkbox" checked value="skills" class="layer-toggle w-4 h-4 text-neuro-teal rounded border-neuro-border bg-neuro-dark"> Core Skills
+                        </label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-white transition-colors">
+                            <input type="checkbox" checked value="research" class="layer-toggle w-4 h-4 text-purple-400 rounded border-neuro-border bg-neuro-dark"> Research Fields
+                        </label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-white transition-colors">
+                            <input type="checkbox" checked value="career" class="layer-toggle w-4 h-4 text-amber-400 rounded border-neuro-border bg-neuro-dark"> Careers
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Legend -->
+                <div id="graph-legend" class="bg-neuro-card/80 backdrop-blur border border-neuro-border p-3 rounded-xl shadow-lg text-xs grid grid-cols-2 gap-x-4 gap-y-2">
+                </div>
             </div>
 
-            <!-- Details Sidebar -->
-            <div id="pathway-sidebar" class="absolute top-0 right-0 h-full w-80 bg-neuro-card/95 backdrop-blur border-l border-neuro-border p-6 transform translate-x-full transition-transform duration-300 overflow-y-auto">
-                <button onclick="closeSidebar()" class="absolute top-4 right-4 text-neuro-muted hover:text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <!-- Top Right: Search -->
+            <div class="absolute top-4 right-4 z-10 pointer-events-auto flex gap-2">
+                <div class="relative">
+                    <svg class="w-4 h-4 absolute left-3 top-2.5 text-neuro-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="graph-search" placeholder="Search nodes..." class="bg-neuro-card/90 backdrop-blur border border-neuro-border rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-neuro-blue w-64 shadow-lg transition-all">
+                </div>
+            </div>
+
+            <!-- Bottom Tools -->
+            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex gap-3 pointer-events-auto">
+                <button onclick="startGuidedTour()" class="bg-neuro-teal hover:bg-teal-400 text-neuro-dark font-medium px-4 py-2 rounded-full shadow-[0_0_15px_rgba(45,212,191,0.4)] transition-all flex items-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Guided Tour
                 </button>
-                <div class="mt-4">
-                    <span id="node-badge" class="text-xs font-semibold uppercase tracking-wider text-neuro-teal bg-neuro-teal/10 px-2 py-1 rounded">Stage</span>
-                    <h3 id="node-title" class="font-serif text-2xl text-white mt-3 mb-4">Node Title</h3>
-                    <p id="node-desc" class="text-neuro-muted text-sm leading-relaxed mb-6">Description goes here.</p>
-                    
-                    <h4 class="text-white text-sm font-medium mb-3 border-b border-neuro-border pb-1">Key Focus Areas</h4>
-                    <ul id="node-skills" class="text-sm text-neuro-muted space-y-2 mb-6 list-disc pl-4">
-                    </ul>
+                <button onclick="resetGraphView()" class="bg-neuro-card/90 hover:bg-neuro-border border border-neuro-border text-white px-4 py-2 rounded-full shadow-lg transition-all text-sm">
+                    Overview (Reset View)
+                </button>
+            </div>
+
+            <!-- Tour Overlay -->
+            <div id="tour-overlay" class="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-20 bg-neuro-card border border-neuro-teal/50 p-5 rounded-xl shadow-2xl max-w-lg w-full hidden pointer-events-auto">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold tracking-widest text-neuro-teal uppercase">Guided Tour (<span id="tour-step">1/5</span>)</span>
+                    <button onclick="endTour()" class="text-neuro-muted hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+                <h3 id="tour-title" class="text-xl font-serif text-white mb-2">Title</h3>
+                <p id="tour-desc" class="text-sm text-neuro-muted mb-4">Description text goes here.</p>
+                <div class="flex justify-between">
+                    <button id="tour-prev" onclick="tourNav(-1)" class="text-sm text-neuro-blue hover:text-white disabled:opacity-50">← Previous</button>
+                    <button id="tour-next" onclick="tourNav(1)" class="text-sm text-neuro-blue hover:text-white disabled:opacity-50">Next →</button>
+                </div>
+            </div>
+
+            <!-- Deep Info Sidebar -->
+            <div id="pathway-sidebar" class="absolute top-0 right-0 h-full w-96 bg-neuro-card/95 backdrop-blur-md border-l border-neuro-border p-0 transform translate-x-full transition-transform duration-300 overflow-hidden flex flex-col shadow-2xl z-20">
+                <div class="p-6 border-b border-neuro-border relative shrink-0">
+                    <button onclick="closeSidebar()" class="absolute top-6 right-6 text-neuro-muted hover:text-white bg-neuro-dark rounded p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div class="flex gap-2 mb-3" id="node-tags"></div>
+                    <h3 id="node-title" class="font-serif text-2xl text-white mb-2 pr-6 leading-tight">Node Title</h3>
+                    <div class="flex items-center text-xs text-neuro-muted gap-4">
+                        <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <span id="node-time"></span></span>
+                        <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> <span id="node-difficulty" class="capitalize"></span></span>
+                    </div>
+                </div>
+                <div class="p-6 overflow-y-auto flex-grow custom-scroll space-y-8">
+                    <div><p id="node-desc" class="text-neuro-text text-sm leading-relaxed"></p></div>
+                    <div id="section-prereqs">
+                        <h4 class="text-xs font-bold text-neuro-muted uppercase tracking-wider mb-3">Prerequisites</h4>
+                        <div id="node-prereqs" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="section-unlocks">
+                        <h4 class="text-xs font-bold text-neuro-muted uppercase tracking-wider mb-3">This Unlocks</h4>
+                        <div id="node-unlocks" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-neuro-muted uppercase tracking-wider mb-3">Curated Resources</h4>
+                        <ul id="node-resources" class="space-y-3"></ul>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- API Key Modal -->
-    <div id="api-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center">
-        <div class="bg-neuro-card border border-neuro-border p-6 rounded-xl w-full max-w-md">
-            <h3 class="text-lg font-medium text-white mb-2">OpenRouter API Key</h3>
-            <p class="text-xs text-neuro-muted mb-4">Add your free OpenRouter key for dynamic AI checklists. If left blank, the app uses a robust built-in fallback engine based on data modality.</p>
-            <input type="password" id="api-key-input" class="w-full bg-neuro-dark border border-neuro-border rounded-lg px-4 py-2 text-white mb-4 focus:outline-none focus:border-neuro-teal" placeholder="sk-or-v1-...">
-            <div class="flex justify-end gap-3">
-                <button onclick="toggleApiModal()" class="px-4 py-2 text-sm text-neuro-muted hover:text-white">Cancel</button>
-                <button onclick="saveApiKey()" class="px-4 py-2 text-sm bg-neuro-teal text-neuro-dark rounded hover:bg-teal-500 font-medium">Save Key</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Load data files normally -->
     <script src="resources.js"></script>
     <script src="pathways.js"></script>
-    <script src="app.js"></script>
+    
+    <!-- Load app logic as a Module to utilize imports natively -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
