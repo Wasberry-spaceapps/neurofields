@@ -54,8 +54,110 @@ function renderResources() {
     });
 }
 
-// --- Before You Code (Unchanged) ---
-// [The existing Before You Code functions (generateChecklist, checkSignOff, exportProtocol) remain exactly the same as previously written.]
+
+// --- Before You Code ---
+const hardcodedFallbacks = {
+    "fMRI": [
+        "Define motion threshold for volume censoring (scrubbing) (e.g., FD > 0.2mm).",
+        "Specify spatial smoothing kernel FWHM before running stats.",
+        "Determine exact nuisance regressors to include (CSF, White Matter, 6 or 24 motion params).",
+        "Establish cluster-forming threshold for multiple comparisons (e.g., p<0.001 uncorrected).",
+        "Define criteria for excluding subjects entirely (e.g., >20% volumes scrubbed)."
+    ],
+    "EEG": [
+        "Define high-pass and low-pass filter cutoff frequencies.",
+        "Specify bad channel identification and interpolation method.",
+        "Define artifact rejection threshold (e.g., +/- 100 µV).",
+        "Establish criteria for rejecting independent components (ICA) related to blinks/heartbeat.",
+        "Define epoch baseline correction window (e.g., -200ms to 0ms)."
+    ],
+    "Behavioral": [
+        "Define absolute Reaction Time (RT) cutoff limits (e.g., < 150ms or > 3000ms).",
+        "Decide how to handle missing or timed-out trials in modeling.",
+        "Establish criteria for participant exclusion based on overall accuracy.",
+        "Specify data transformation for skewed variables (e.g., log RT) prior to linear models.",
+        "Define exact primary outcome measure (e.g., d-prime vs raw accuracy)."
+    ],
+    "Electrophysiology": [
+        "Define spike sorting parameters and cluster isolation thresholds.",
+        "Specify firing rate criteria to include a unit in group analysis.",
+        "Define bin size for Peri-Stimulus Time Histograms (PSTH).",
+        "Determine exactly how trials with electrical artifacts will be dropped.",
+        "Establish criteria for defining 'significant' responsiveness of a cell to a stimulus."
+    ],
+    "Transcriptomics": [
+        "Define minimum read/UMI count threshold per cell.",
+        "Specify cutoff for mitochondrial gene percentage to exclude dead cells.",
+        "Determine normalization method (e.g., SCTransform vs standard log normalization).",
+        "Define exact parameters for dimensionality reduction (number of PCs).",
+        "Establish threshold for differential expression significance."
+    ]
+};
+
+async function generateChecklist() {
+    const modality = document.getElementById('byc-modality').value;
+    const desc = document.getElementById('byc-desc').value;
+    const btn = document.getElementById('btn-generate');
+    const container = document.getElementById('checklist-container');
+    const listEl = document.getElementById('checklist-items');
+    
+    if(!desc) { alert("Please provide a brief study description."); return; }
+    btn.innerHTML = `Generating Protocol...`;
+    
+    await new Promise(r => setTimeout(r, 600)); // Simulate thinking
+    const items = hardcodedFallbacks[modality];
+
+    listEl.innerHTML = '';
+    items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "flex gap-4 p-4 bg-neuro-dark rounded-lg border border-neuro-border";
+        div.innerHTML = `
+            <div class="flex-shrink-0 mt-0.5">
+                <input type="checkbox" class="checklist-item-box w-5 h-5 text-neuro-teal bg-neuro-dark border-neuro-border rounded focus:ring-neuro-teal" onchange="checkSignOff()">
+            </div>
+            <div class="text-sm text-neuro-text">${item}</div>
+        `;
+        listEl.appendChild(div);
+    });
+
+    container.classList.remove('hidden');
+    btn.innerHTML = `Generate Data Protocol`;
+    document.getElementById('sign-off-box').checked = false;
+    checkSignOff();
+}
+
+function checkSignOff() {
+    const allChecked = Array.from(document.querySelectorAll('.checklist-item-box')).every(cb => cb.checked);
+    const signOff = document.getElementById('sign-off-box').checked;
+    const btn = document.getElementById('btn-export');
+    
+    if(allChecked && signOff) {
+        btn.disabled = false;
+        btn.classList.remove('bg-neuro-border', 'text-neuro-muted', 'cursor-not-allowed');
+        btn.classList.add('bg-neuro-teal', 'text-neuro-dark', 'hover:bg-teal-500');
+    } else {
+        btn.disabled = true;
+        btn.classList.add('bg-neuro-border', 'text-neuro-muted', 'cursor-not-allowed');
+        btn.classList.remove('bg-neuro-teal', 'text-neuro-dark', 'hover:bg-teal-500');
+    }
+}
+
+function exportProtocol() {
+    const modality = document.getElementById('byc-modality').value;
+    const date = new Date().toISOString().split('T')[0];
+    const items = Array.from(document.querySelectorAll('#checklist-items .text-sm')).map(el => el.innerText);
+    
+    let content = `# Data Analysis Protocol\nDate: ${date}\nModality: ${modality}\n\n`;
+    items.forEach((item, i) => content += `${i+1}. [x] ${item}\n`);
+    
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `data_protocol_${date}.md`;
+    a.click();
+}
+
 
 // --- 3D Graph Pathways Map ---
 let Graph;
@@ -71,6 +173,7 @@ function initGraph() {
     
     // Build Legend
     const legend = document.getElementById('graph-legend');
+    legend.innerHTML = ''; // Clear prior entries just in case
     for (const [key, color] of Object.entries(window.clusterColors)) {
         legend.innerHTML += `<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full" style="background:${color}; box-shadow: 0 0 8px ${color}"></div><span class="text-neuro-muted capitalize">${key.replace('_',' ')}</span></div>`;
     }
@@ -80,13 +183,12 @@ function initGraph() {
         .graphData(window.pathwaysData)
         .nodeRelSize(4)
         .nodeThreeObject(node => {
-            // Group holds sphere + halo + label
             const group = new THREE.Group();
             
-            // Core Sphere
             const isDimmed = searchHighlightNodes.size > 0 && !searchHighlightNodes.has(node);
             const opacity = isDimmed ? 0.1 : 0.9;
             
+            // Core Sphere
             const geometry = new THREE.SphereGeometry(node.size * 2, 16, 16);
             const material = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: opacity });
             const sphere = new THREE.Mesh(geometry, material);
@@ -104,7 +206,7 @@ function initGraph() {
             const sprite = new SpriteText(node.label);
             sprite.color = isDimmed ? '#334155' : '#ffffff';
             sprite.textHeight = Math.max(2, node.size * 0.8);
-            sprite.position.y = -(node.size * 2.5); // position below sphere
+            sprite.position.y = -(node.size * 2.5);
             group.add(sprite);
 
             return group;
@@ -114,9 +216,7 @@ function initGraph() {
         .linkDirectionalParticles(link => (searchHighlightNodes.size === 0 || searchHighlightNodes.has(link.source) || searchHighlightNodes.has(link.target)) ? 2 : 0)
         .linkDirectionalParticleWidth(1.5)
         .linkDirectionalParticleSpeed(0.005)
-        .onNodeClick(node => {
-            focusNode(node);
-        });
+        .onNodeClick(node => focusNode(node));
 
     graphInitialized = true;
     
@@ -152,17 +252,14 @@ function initGraph() {
 }
 
 function updateGraphVisuals() {
-    // Refresh node three objects to apply dimming
     Graph.nodeThreeObject(Graph.nodeThreeObject());
     Graph.linkDirectionalParticles(Graph.linkDirectionalParticles());
 }
 
 function filterGraphData() {
-    // Filter nodes based on active layers
     const fNodes = window.pathwaysData.nodes.filter(n => n.layers.some(l => activeLayers.has(l)));
     const nodeIds = new Set(fNodes.map(n => n.id));
     const fLinks = window.pathwaysData.links.filter(l => {
-        // Links are objects after init, so we check id or source/target
         const srcId = typeof l.source === 'object' ? l.source.id : l.source;
         const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
         return nodeIds.has(srcId) && nodeIds.has(tgtId);
@@ -175,7 +272,6 @@ function focusNode(nodeOrId) {
     let node = typeof nodeOrId === 'string' ? window.pathwaysData.nodes.find(n => n.id === nodeOrId) : nodeOrId;
     if(!node) return;
 
-    // Camera Fly
     const distance = 80;
     const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
     Graph.cameraPosition(
@@ -187,7 +283,7 @@ function focusNode(nodeOrId) {
 }
 
 function resetGraphView() {
-    Graph.zoomToFit(1500, 50);
+    if(Graph) Graph.zoomToFit(1500, 50);
     closeSidebar();
 }
 
@@ -195,7 +291,6 @@ function resetGraphView() {
 function showSidebar(node) {
     const sidebar = document.getElementById('pathway-sidebar');
     
-    // Tags
     const tagsDiv = document.getElementById('node-tags');
     tagsDiv.innerHTML = '';
     node.layers.forEach(l => tagsDiv.innerHTML += `<span class="px-2 py-1 bg-neuro-dark border border-neuro-border rounded text-[10px] uppercase font-bold text-neuro-muted">${l}</span>`);
@@ -206,7 +301,6 @@ function showSidebar(node) {
     document.getElementById('node-time').innerText = node.time;
     document.getElementById('node-difficulty').innerText = node.difficulty;
     
-    // Prereqs
     const preDiv = document.getElementById('node-prereqs');
     preDiv.innerHTML = '';
     if(node.prereqs.length === 0) preDiv.innerHTML = '<span class="text-xs text-neuro-border italic">None required</span>';
@@ -215,7 +309,6 @@ function showSidebar(node) {
         if(pNode) preDiv.innerHTML += `<button onclick="focusNode('${pid}')" class="nav-chip">${pNode.label}</button>`;
     });
 
-    // Unlocks
     const unDiv = document.getElementById('node-unlocks');
     unDiv.innerHTML = '';
     if(node.unlocks.length === 0) unDiv.innerHTML = '<span class="text-xs text-neuro-border italic">End of current path</span>';
@@ -224,7 +317,6 @@ function showSidebar(node) {
         if(uNode) unDiv.innerHTML += `<button onclick="focusNode('${uid}')" class="nav-chip">${uNode.label}</button>`;
     });
 
-    // Resources
     const resUl = document.getElementById('node-resources');
     resUl.innerHTML = '';
     if(!node.resources || node.resources.length === 0) {
@@ -289,3 +381,17 @@ function showTourStep() {
 
     focusNode(step.id);
 }
+
+// --- BOOT SEQUENCE ---
+// Automatically figure out which view is active on load and initialize it
+document.addEventListener('DOMContentLoaded', () => {
+    const activeView = document.querySelector('.page-view.active');
+    if (activeView) {
+        const viewId = activeView.id.replace('view-', '');
+        if (viewId === 'pathways') initGraph();
+        if (viewId === 'resources') renderResources();
+    } else {
+        // Fallback safety
+        navigate('home');
+    }
+});
