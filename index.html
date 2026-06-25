@@ -29,16 +29,16 @@
         }
     </script>
     
-    <!-- 3D Force Graph & Three.js -->
-    <script src="https://unpkg.com/three"></script>
-    <script src="https://unpkg.com/three-spritetext"></script>
-    <script src="https://unpkg.com/3d-force-graph"></script>
+    <!-- Pinned stable versions for 3D Rendering to prevent version conflicts -->
+    <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
+    <script src="https://unpkg.com/three-spritetext@1.8.1/dist/three-spritetext.min.js"></script>
+    <script src="https://unpkg.com/3d-force-graph@1.73.3/dist/3d-force-graph.min.js"></script>
     
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-neuro-dark text-neuro-text font-sans antialiased min-h-screen flex flex-col overflow-x-hidden">
 
-    <!-- Navigation (Unchanged) -->
+    <!-- Navigation -->
     <nav class="border-b border-neuro-border bg-neuro-dark/80 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -60,8 +60,8 @@
     <!-- Main Content Area -->
     <main class="flex-grow relative">
         
-        <!-- View: HOME (Unchanged) -->
-        <section id="view-home" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 hidden">
+        <!-- View: HOME (Set as default active) -->
+        <section id="view-home" class="page-view active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div class="max-w-3xl">
                 <h1 class="font-serif text-5xl sm:text-6xl text-white leading-tight mb-6">
                     Mapping the mind requires a <span class="text-transparent bg-clip-text bg-gradient-to-r from-neuro-teal to-neuro-blue">clear canvas.</span>
@@ -86,7 +86,7 @@
             </div>
         </section>
 
-        <!-- View: BEFORE YOU CODE (Unchanged) -->
+        <!-- View: BEFORE YOU CODE -->
         <section id="view-before-code" class="page-view max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 hidden">
             <div class="mb-10 border-b border-neuro-border pb-8">
                 <h2 class="font-serif text-3xl text-white mb-3">Before You Code</h2>
@@ -131,7 +131,7 @@
             </div>
         </section>
 
-        <!-- View: NEURO RESOURCES (Unchanged) -->
+        <!-- View: NEURO RESOURCES -->
         <section id="view-resources" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 hidden">
             <div class="mb-8 border-b border-neuro-border pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div class="max-w-2xl">
@@ -159,14 +159,13 @@
             <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- View: PATHWAYS (MASSIVELY UPGRADED) -->
-        <section id="view-pathways" class="page-view active h-[calc(100vh-64px)] w-full relative flex overflow-hidden">
+        <!-- View: PATHWAYS (Set to hidden initially so routing handles init) -->
+        <section id="view-pathways" class="page-view h-[calc(100vh-64px)] w-full relative flex overflow-hidden hidden">
             
             <!-- 3D Graph Container -->
             <div id="3d-graph" class="w-full h-full bg-[#050914] cursor-move"></div>
             
             <!-- UI OVERLAYS -->
-            
             <!-- Top Left: Layer Filters -->
             <div class="absolute top-4 left-4 z-10 flex flex-col gap-2 pointer-events-auto">
                 <div class="bg-neuro-card/80 backdrop-blur border border-neuro-border p-3 rounded-xl shadow-lg">
